@@ -1,154 +1,180 @@
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
-import { useState } from "react"
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import React, { useState } from 'react';
 
-export default function App(){
+export default function App() {
+    const [lista, setLista] = useState([])
+
+    const [nome, setNome] = useState('')
     const [email, setEmail] = useState('')
-    const [senha, setSenha] = useState('')
-    const [autenticado, setAutenticado] = useState(false)
-    const [tentativas, setTentativas] = useState(0)
+    const [telefone, setTelefone] = useState('')
+    const [submitted, setSubmitted] = useState(false)
 
-    const bloqueado = tentativas >= 5
+    const canSubmit = !!(nome && email && telefone)
 
-    const url = autenticado === true
-     ? "data:image/jpeg;base64,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"
-     : "https://img.freepik.com/psd-premium/logotipo-da-aplicacao-instagram_23-2151544088.jpg?semt=ais_hybrid&w=740&q=80"
-   
-     function login(email, senha){
-        setTentativas(tentativas+1)
+    function submitForm(nome,email,telefone){
+        if(submitted === true) return null
+        if(email.includes("@") === false) return null
+        
+        if(nome.lenght < 3) return null
+    
+        const formulario = {
+            nome: nome,
+            email: email,
+            telefone: telefone,
+        };
 
-        if(bloqueado) return null
-
-        if(email === "cedu1907@gmail.com" && senha === "Super") {
-            setAutenticado(true)
-        }else{
-            setAutenticado(false)
-        }
+        setLista([...lista, formulario ])
+        setNome("")
+        setEmail("")
+        setTelefone("")
+        setSubmitted(true)
     }
 
-    return(
-        <View style={styles.container}>   
-            <Image
-              source={{
-                uri: url
-              }}
-              width={64}
-              height={64}  
-              style={styles.logo}
-            />
+    return (
+        <View style={styles.container}>
+            <View>
+                <Text style={styles.badge}> Formulário</Text>
+            </View>
 
-            {autenticado && (
-              <View style={{backgroundColor: 'green', borderRadius: 15, paddingHorizontal: 24, paddingVertical: 10, marginBottom: 90}}>
-                  <Text style={{color: "white"}}>Você está autenticado!</Text>
-              </View>
-            )}
+            <View style={styles.header}>
+              <Text style={styles.title}>Entre em contato</Text>
+              <Text style={styles.subtitle}>Prencha os campos abaixo com a informação</Text>
+            </View>
+         
+         <KeyboardAvoidingView behavior='padding'>  
+            <View style={styles.card}>
+                <View style={styles.grupo}>
+                    <Text style={styles.label}>Nome Completo </Text>
+                    <TextInput 
+                     style={styles.input} 
+                     placeholder='Digite seu Nome' 
+                     value={nome}
+                     onChangeText={(texto) => setNome(texto)}
+                     textContentType='name'
+                    />
+                </View>
 
-            {bloqueado && (
-              <View style={{backgroundColor: 'red', borderRadius: 25, paddingHorizontal: 24, paddingVertical: 10}}>
-                  <Text style={{color: "white"}}>Você está bloqueado!</Text>
-              </View>
-            )}
+                <View style={styles.grupo}>
+                    <Text style={styles.label}> Email </Text>
+                    <TextInput 
+                     style={styles.input} 
+                     placeholder='Digite seu Email' 
+                     value={email}
+                     onChangeText={(texto) => setEmail(texto)}
+                     keyboardType='email-address'
+                    />
+                </View>
 
-            {!autenticado && (
-              <View style={styles.card}>
-                <TextInput
-                style={styles.caixaT}
-                placeholder="E-mail"
-                placeholderTextColor={"#2b2a2a"}
-                value={email}
-                onChangeText={(texto) => setEmail(texto)}
-                />
-             
-                <TextInput
-                style={styles.caixaT}
-                placeholder="Senha"
-                placeholderTextColor={"#2b2a2a"}
-                value={senha}
-                onChangeText={(texto) => setSenha(texto)}
-                secureTextEntry
-                /> 
-               {(!autenticado || !bloqueado) && (
-                  <TouchableOpacity  onPress={() => login(email,senha)} style={styles.botao}>
-                    <Text style={styles.textoBotao}>Entrar</Text>
-                 </TouchableOpacity>
-               )} 
-              </View>          
-            )}
+                <View style={styles.grupo}>
+                    <Text style={styles.label}> Telefone </Text>
+                    <TextInput 
+                     style={styles.input} 
+                     placeholder='Digite seu Telefone' 
+                     value={telefone}
+                     onChangeText={(texto) => setTelefone(texto)}
+                     keyboardType='number-pad'
+                    />
+                </View>
+
+                <TouchableOpacity 
+                  disabled={!canSubmit}      
+                  onPress={() => submitForm(nome, email, telefone)}
+                  style={{
+                     marginTop: 8,
+                     backgroundColor: submitted ? "#32880a" : "#000000",
+                     borderRadius: 16,
+                     paddingVertical: 16,
+                     alignItems: 'center',
+                     justifyContent: 'center',
+                  }}>
+                    <Text style={styles.buttonText}>{submitted ? "Informações Salvas!" : (canSubmit ? "Enviar" : "Preencha as informações")}</Text>
+                </TouchableOpacity>
+
+            </View>
+          </KeyboardAvoidingView>
+
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
-    container:{
+    flex: {
         flex: 1,
-        backgroundColor:"#ffffff",
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 70,
+        backgroundColor: '#F7F8FA'
     },
-    logo: {
-        width: 140,
-        height: 140,
-        marginBottom: 50,
-        borderRadius: 60,
+    container: {
+        paddingHorizontal: 20,
+        paddingTop: 24,
+        paddingBottom: 32,
+        justifyContent: 'center',
     },
-    caixaT:{
-        backgroundColor: "#f3f3f3",
-        width: 300,
-        height: 50,
-        borderRadius: 20,
-        paddingLeft: 15,
-        fontWeight: "200",
+    header: {
+        marginBottom: 24,
+    },
+    badge: {
+        alignSelf: 'flex-start',
+        backgroundColor: '#E8EEF9',
+        color: '#3B82F6',
+        fontSize: 12,
+        fontWeight: '700',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 999,
+        marginBottom: 14,
+        marginTop: 25,
+    },
+
+
+    title: {
+        fontSize: 30,
+        fontWeight: '700',
+        color: '#111827',
+        marginBottom: 8,
+    },
+    subtitle: {
+        fontSize: 15,
+        color: '#6B7280',
+        lineHeight: 22,
     },
     card: {
-        marginBottom: 250,
-        backgroundColor:"#bbbaba",
-        height: 240, 
-        justifyContent: "space-between",    //space-around
-        marginTop: 50,
-        borderRadius: 25,
-        padding: 15
+        backgroundColor: '#FFFFFF',
+        borderRadius: 24,
+        padding: 20,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 8,
+        },
+        shadowOpacity: 0.06,
+        shadowRadius: 18,
+        elevation: 4,
     },
-    botao:{
-        backgroundColor:"#363535",
-        width: 300,
-        height: 50,
-        borderRadius: 20,
-        justifyContent: "center",
-        alignItems: "center",
+    grupo: {
+        marginBottom: 18,
     },
-    textoBotao: {
-        color: "#f1f1f1",
-        fontSize: 20,
-        fontWeight: "600"
-    }
-})
-
-
-// import React, {useState} from "react"
-// import {View, Text, Button, StyleSheet} from "react-native"
-
-// export default function Contador(){
-//     const [count, setCount] = useState(0)
-
-//     return(
-//         <View style={styles.container}>
-//             <Text>Cliques: {count}</Text>
-//             <Button 
-//               title = "Adicionar"
-//               onPress={() => setCount(count+1)}
-//             />
-//         </View>
-//     )
-// }
-
-// const styles = StyleSheet.create({
-//     container:{
-//         flex: 1,
-//         backgroundColor:"#ffffff",
-//         justifyContent: "center",
-//         alignItems: "center",
-//     },
-//     texto: {
-//        marginBottom: 10,
-//     },
-// })
+    label: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#374151',
+        marginBottom: 8,
+    },
+    input: {
+        width: '100%',
+        backgroundColor: '#F9FAFB',
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        borderRadius: 16,
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        fontSize: 15,
+        color: '#111827',
+    },
+    button: {
+       
+    },
+    buttonText: {
+        color: '#FFFFFF',
+        fontSize: 15,
+        fontWeight: '700',
+    },
+});
